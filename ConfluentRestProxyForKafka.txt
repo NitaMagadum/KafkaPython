@@ -1,0 +1,119 @@
+Kafka Server Launch:
+-------------------------------------------
+wget https://dlcdn.apache.org/kafka/3.2.3/...
+tar -xvf kafka_2.12-3.2.3.tgz
+
+To install Java --
+----------------------------------------
+java -version
+sudo yum install java-1.8.0-openjdk
+java -version
+cd kafka_2.12-3.2.3
+
+Start Zoo-keeper:
+-------------------------------
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+
+Start Kafka-server:
+----------------------------------------
+Duplicate the session & enter in a new console --
+export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"
+cd kafka_2.12-3.2.3
+bin/kafka-server-start.sh config/server.properties
+
+It is pointing to private server , change server.properties so that it can run in public IP 
+
+To do this , we can follow any of the 2 approaches belwo --
+1)Do a vi config/server.properties in insert mode -- change ADVERTISED_LISTENERS to public ip of the EC2 instance
+2)modify the file using Winscp also
+
+
+Confluent Kafka Installation:
+-----------------------------------------------------
+wget  http://packages.confluent.io/archive/...
+sudo yum install java-1.8.0-openjdk
+
+
+unzip confluent-5.1.2-2.11.zip
+
+export CONFLUENT_HOME=/home/ec2-user/confluent-5.1.2
+export PATH=$PATH:$CONFLUENT_HOME/bin
+
+vi confluent-5.1.2/etc/kafka-rest/kafka-rest.properties 
+bootstrap.servers={}:9092
+advertised.listeners={}:8082
+
+
+confluent-5.1.2/bin/kafka-rest-start confluent-5.1.2/etc/kafka-rest/kafka-rest.properties 
+
+
+
+
+Create Topic:
+---------------------------------
+cd kafka_2.12-3.2.3
+bin/kafka-topics.sh --create --topic demo_testing2 --bootstrap-server {}:9092 --replication-factor 1 --partitions 1
+
+
+Find out list of topics:
+-------------------------------------------
+http://{}:8082/topics
+
+Create one more topic :
+-----------------------------------------
+
+bin/kafka-topics.sh --create --topic demotesting3 --bootstrap-server {}:9092 --replication-factor 1 --partitions 1
+
+Pass data:
+------------------------------
+Start the consumer
+bin/kafka-console-consumer.sh --topic demo_testing2 --bootstrap-server {}:9092
+
+http://{}:8082/topics/{}
+
+
+Content-Type: application/vnd.kafka.json.v2+json
+
+{"records":[{"value":{"name": "testUser"}}]}
+
+{
+  "records": [
+    {
+      "key": "1",
+      "value": {
+        "id": "1",
+        "customer_code": "1",
+        "telephone": "888582158",
+        "email": "supplier1@test.com",
+        "language": "EN"        
+      }
+    }
+  ]
+}
+
+
+{
+  "records": [
+    {
+      "key": "3",
+      "value": {
+        "id": "3",
+        "customer_code": "3",
+        "telephone": "888582154",
+        "email": "supplier3@test.com",
+        "language": "EN"        
+      }
+    },
+  {
+      "key": "2",
+      "value": {
+        "id": "2",
+        "customer_code": "2",
+        "telephone": "788682158",
+        "email": "supplier2@test.com",
+        "language": "EN"        
+      }
+    }
+  ]
+}
